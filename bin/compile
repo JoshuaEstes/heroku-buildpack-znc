@@ -32,6 +32,7 @@ cd $BUILD_DIR
 curl -s http://znc.in/releases/znc-latest.tar.gz > znc-latest.tar.gz
 tar -xzf znc-latest.tar.gz
 rm znc-latest.tar.gz
+ls -alh
 
 echo "-----> Configuring"
 ./autogen.sh 2>&1 1>/dev/null | indent
