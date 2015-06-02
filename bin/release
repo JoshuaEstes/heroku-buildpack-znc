@@ -15,6 +15,8 @@ echo "-----> bin/release"
 cat << EOF
 ---
 addons: []
+config_vars:
+  PORT: 6667
 default_process_types:
   znc: bin/run
 EOF
