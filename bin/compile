@@ -29,38 +29,50 @@ indent() {
     sed -u 's/^/       /'
 }
 
-echo "-----> BUILD_DIR"
-echo "$BUILD_DIR" | indent
-echo "-----> CACHE_DIR"
-echo "$CACHE_DIR" | indent
-echo "-----> ENV_DIR"
-echo "$ENV_DIR" | indent
+if [ -f $CACHE_DIR/VERSION ]; then
+    CACHED_VERSION="$(cat $CACHE_DIR/VERSION)"
+    echo "-----> CACHED_VERSION"
+    echo $CACHED_VERSION | indent
+fi
 
-echo -n $VERSION > $BUILD_DIR/VERSION
-cat $BUILD_DIR/VERSION
 
-exit 1
+if [ "$VERSION" = "$CACHED_VERSION" ]; then
+    echo "-----> No change in znc version"
+    mv $CACHE_DIR/src $BUILD_DIR/src
+else
+    cd $BUILD_DIR
 
-echo "-----> Downloading"
-cd $BUILD_DIR
-curl -s "http://znc.in/releases/$RELEASE.tar.gz" > znc.tar.gz
-tar -xzf znc.tar.gz
-mv $RELEASE src
-rm znc.tar.gz
+    echo "-----> Downloading"
+    curl -s "http://znc.in/releases/$RELEASE.tar.gz" > znc.tar.gz
+    tar -xzf znc.tar.gz
+    mv $RELEASE src
+    rm znc.tar.gz
 
-echo "-----> Configuring"
-cd $BUILD_DIR/src/
-./autogen.sh 2>&1 1>/dev/null | indent
-./configure --prefix=$BUILD_DIR --enable-run-from-source | indent
+    echo "-----> Configuring"
+    cd $BUILD_DIR/src/
+    ./autogen.sh 2>&1 1>/dev/null | indent
+    ./configure --prefix=$BUILD_DIR --enable-run-from-source | indent
 
-echo "-----> Compiling"
-make 2>&1 1>/dev/null | indent
+    echo "-----> Compiling"
+    make 2>&1 1>/dev/null | indent
 
-echo "-----> Installing"
-make install 2>&1 1>/dev/null | indent
+    echo "-----> Installing"
+    make install 2>&1 1>/dev/null | indent
+
+    echo "-----> Cleaning Up"
+    rm -rf $CACHE_DIR/src $CACHE_DIR/VERSION
+
+
+    echo "-----> Moving artifacts to cache"
+    mv $BUILD_DIR/src $CACHE_DIR/
+    echo -n $VERSION > $CACHE_DIR/VERSION
+fi
+
+echo "-----> Setting up app"
 mkdir -vp $BUILD_DIR/.znc/{configs,modules,moddata,users}
-mv -v $BUILD_DIR/znc.conf $BUILD_DIR/.znc/configs/znc.conf
-ls -alh $BUILD_DIR
-ls -alh $BUILD_DIR/bin/
+
+if [ -f $BUILD_DIR/znc.conf ]; then
+    mv -v $BUILD_DIR/znc.conf $BUILD_DIR/.znc/configs/znc.conf
+fi
 
 exit 0
