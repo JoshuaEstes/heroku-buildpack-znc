@@ -48,4 +48,4 @@ mkdir -vp $BUILD_DIR/.znc/{configs,modules,moddata,users}
 mv -v $BUILD_DIR/znc.conf $BUILD_DIR/.znc/configs/znc.conf
 
 echo "-----> Meh"
-mv -v $BUILD_DIR/znc-1.6.0/bin/* $BUILD_DIR/bin/ | indent
+mv -v $BUILD_DIR/znc-1.6.0/bin/znc $BUILD_DIR/bin/znc | indent
