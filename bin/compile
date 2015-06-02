@@ -35,11 +35,7 @@ if [ -f $CACHE_DIR/VERSION ]; then
     echo $CACHED_VERSION | indent
 fi
 
-
-if [ "$VERSION" = "$CACHED_VERSION" ]; then
-    echo "-----> No change in znc version"
-    #mv $CACHE_DIR/src $BUILD_DIR/src
-else
+if [ ! -d "$BUILD_DIR/src" ] || [ ! -d "$CACHE_DIR/src" ]; then
     cd $BUILD_DIR
 
     echo "-----> Downloading"
@@ -61,6 +57,9 @@ else
 
     echo "-----> Cleaning Up"
     rm -rf $CACHE_DIR/src $CACHE_DIR/VERSION
+elif [ "$VERSION" = "$CACHED_VERSION" ]; then
+    echo "-----> No change in znc version"
+    mv $CACHE_DIR/src $BUILD_DIR/src
 fi
 
 echo "-----> Moving artifacts to cache"
