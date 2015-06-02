@@ -38,7 +38,7 @@ fi
 
 if [ "$VERSION" = "$CACHED_VERSION" ]; then
     echo "-----> No change in znc version"
-    mv $CACHE_DIR/src $BUILD_DIR/src
+    #mv $CACHE_DIR/src $BUILD_DIR/src
 else
     cd $BUILD_DIR
 
@@ -61,7 +61,6 @@ else
 
     echo "-----> Cleaning Up"
     rm -rf $CACHE_DIR/src $CACHE_DIR/VERSION
-
 fi
 
 echo "-----> Moving artifacts to cache"
