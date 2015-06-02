@@ -52,12 +52,14 @@ if [ ! -d "$BUILD_DIR/znc" ] && [ ! -d "$CACHE_DIR/znc" ]; then
     echo "-----> Compiling"
     make | indent
 
+    rm -rf $CACHE_DIR/znc $CACHE_DIR/VERSION
     cp -R $BUILD_DIR/znc $CACHE_DIR/znc
     echo -n $VERSION > $CACHE_DIR/VERSION
 elif [ "$VERSION" = "$CACHED_VERSION" ]; then
     echo "-----> No change in znc version"
-    cp -R $CACHE_DIR/znc/* $BUILD_DIR
 fi
+
+cp -R $CACHE_DIR/znc/* $BUILD_DIR
 
 echo "-----> Setting up app"
 mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users}
