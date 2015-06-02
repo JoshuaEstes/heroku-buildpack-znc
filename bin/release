@@ -14,6 +14,5 @@ cat << EOF
 ---
 addons: []
 default_process_types:
-  znc: exec bin/znc -f
-  web: exec bin/znc -f
+  znc: bin/znc -f
 EOF
