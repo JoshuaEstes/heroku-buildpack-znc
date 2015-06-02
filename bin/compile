@@ -8,6 +8,11 @@
 # ```shell
 # bin/compile BUILD_DIR CACHE_DIR ENV_DIR
 # ```
+#
+# ToDo:
+#   - enable python support for addons
+#   - cache the compiled source
+#
 set -e
 set -o pipefail
 
@@ -46,6 +51,6 @@ make install 2>&1 1>/dev/null | indent
 
 mkdir -vp $BUILD_DIR/.znc/{configs,modules,moddata,users}
 mv -v $BUILD_DIR/znc.conf $BUILD_DIR/.znc/configs/znc.conf
-
-echo "-----> Meh"
-mv -v $BUILD_DIR/znc-1.6.0/bin/znc $BUILD_DIR/bin/znc | indent
+ls -alh $BUILD_DIR
+ls -alh $BUILD_DIR/bin/
+#mv -v $BUILD_DIR/znc-1.6.0/bin/znc $BUILD_DIR/bin/znc | indent
