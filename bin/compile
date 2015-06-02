@@ -28,23 +28,30 @@ echo "$ENV_DIR" | indent
 
 
 echo "-----> Downloading"
+ls -alh
 cd $BUILD_DIR
 curl -s http://znc.in/releases/znc-latest.tar.gz > znc-latest.tar.gz
 tar -xzf znc-latest.tar.gz
 rm znc-latest.tar.gz
+ls -alh
 
 echo "-----> Configuring"
 cd $BUILD_DIR/znc-1.6.0/
+ls -alh
 ./autogen.sh 2>&1 1>/dev/null | indent
 ./configure --prefix=$BUILD_DIR | indent
+ls -alh
 
 echo "-----> Compiling"
 make 2>&1 1>/dev/null | indent
+ls -alh
 
 echo "-----> Installing"
 make install 2>&1 1>/dev/null | indent
+ls -alh
 
 mkdir -vp $BUILD_DIR/.znc/{configs,modules,moddata,users}
 mv $BUILD_DIR/znc.conf $BUILD_DIR/.znc/configs/znc.conf
 
 echo "-----> Meh"
+ls -alh
