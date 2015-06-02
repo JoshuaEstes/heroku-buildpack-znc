@@ -12,7 +12,6 @@
 # ToDo:
 #   - update for modules
 #   - enable python support for addons
-#   - cache the compiled source
 #   - possible to configure if no znc.conf found?
 #
 set -e
@@ -55,19 +54,15 @@ if [ ! -d "$BUILD_DIR/src" ] && [ ! -d "$CACHE_DIR/src" ]; then
     echo "-----> Installing"
     make install 2>&1 1>/dev/null | indent
 
-    echo "-----> Cleaning Up"
-    rm -rf $CACHE_DIR/src $CACHE_DIR/VERSION
+    cp -R $BUILD_DIR/src $CACHE_DIR/src
+    echo -n $VERSION > $CACHE_DIR/VERSION
 elif [ "$VERSION" = "$CACHED_VERSION" ]; then
     echo "-----> No change in znc version"
     mv $CACHE_DIR/src $BUILD_DIR/src
 fi
 
-echo "-----> Moving artifacts to cache"
-mv $BUILD_DIR/src $CACHE_DIR/
-echo -n $VERSION > $CACHE_DIR/VERSION
-
 echo "-----> Setting up app"
-mkdir -vp $BUILD_DIR/.znc/{configs,modules,moddata,users}
+mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users}
 
 if [ -f $BUILD_DIR/znc.conf ]; then
     mv -v $BUILD_DIR/znc.conf $BUILD_DIR/.znc/configs/znc.conf
