@@ -35,6 +35,7 @@ rm znc-latest.tar.gz
 ls -alh
 
 echo "-----> Configuring"
+cd $BUILD_DIR/znc-1.6.0/
 ./autogen.sh 2>&1 1>/dev/null | indent
 ./configure --prefix=$BUILD_DIR 2>&1 1>/dev/null | indent
 
