@@ -1,5 +1,3 @@
 #!/usr/bin/env bash
 
-echo "-----> Run $PORT"
-
 exec bin/znc -f

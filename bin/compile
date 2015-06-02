@@ -10,7 +10,6 @@
 # ```
 #
 # ToDo:
-#   - update for modules
 #   - enable python support for addons
 #   - possible to configure if no znc.conf found?
 #
@@ -47,14 +46,14 @@ if [ ! -d "$BUILD_DIR/src" ] && [ ! -d "$CACHE_DIR/src" ]; then
 
     echo "-----> Configuring"
     cd $BUILD_DIR/src/
-    ./autogen.sh 2>&1 1>/dev/null | indent
+    ./autogen.sh | indent
     ./configure --prefix=$BUILD_DIR --enable-run-from-source | indent
 
     echo "-----> Compiling"
-    make 2>&1 1>/dev/null | indent
+    make | indent
 
     echo "-----> Installing"
-    make install 2>&1 1>/dev/null | indent
+    make install | indent
 
     cp -R $BUILD_DIR/src $CACHE_DIR/src
     echo -n $VERSION > $CACHE_DIR/VERSION

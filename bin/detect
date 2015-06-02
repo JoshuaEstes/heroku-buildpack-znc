@@ -9,10 +9,10 @@
 # bin/detect BUILD_DIR
 # ```
 BUILD_DIR=$1
-
 if [ -f $BUILD_DIR/znc.conf ]; then
     echo "ZNC"
     exit 0
 else
+    echo "no"
     exit 1
 fi
