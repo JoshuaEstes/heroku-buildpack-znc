@@ -73,4 +73,6 @@ if [ -f $BUILD_DIR/znc.conf ]; then
     mv -v $BUILD_DIR/znc.conf $BUILD_DIR/.znc/configs/znc.conf
 fi
 
-exit 0
+if [ -f $BUILD_DIR/znc.pem ]; then
+    mv -v $BUILD_DIR/znc.pem $BUILD_DIR/.znc/znc.pem
+fi
