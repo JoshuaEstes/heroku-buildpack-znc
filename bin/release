@@ -10,8 +10,6 @@
 # ```
 BUILD_DIR=$1
 
-echo "-----> bin/release"
-
 cat << EOF
 ---
 addons: []

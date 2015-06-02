@@ -28,6 +28,8 @@ indent() {
     sed -u 's/^/       /'
 }
 
+echo "-----> bin/compile"
+
 if [ -f $CACHE_DIR/VERSION ]; then
     CACHED_VERSION="$(cat $CACHE_DIR/VERSION)"
     echo "-----> CACHED_VERSION"
