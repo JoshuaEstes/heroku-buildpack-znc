@@ -35,31 +35,28 @@ if [ -f $CACHE_DIR/VERSION ]; then
     echo $CACHED_VERSION | indent
 fi
 
-if [ ! -d "$BUILD_DIR/src" ] && [ ! -d "$CACHE_DIR/src" ]; then
+if [ ! -d "$BUILD_DIR/znc" ] && [ ! -d "$CACHE_DIR/znc" ]; then
     cd $BUILD_DIR
 
     echo "-----> Downloading"
     curl -s "http://znc.in/releases/$RELEASE.tar.gz" > znc.tar.gz
     tar -xzf znc.tar.gz
-    mv $RELEASE src
+    mv $RELEASE znc
     rm znc.tar.gz
 
     echo "-----> Configuring"
-    cd $BUILD_DIR/src/
+    cd $BUILD_DIR/znc
     ./autogen.sh | indent
     ./configure --prefix=$BUILD_DIR --enable-run-from-source | indent
 
     echo "-----> Compiling"
     make | indent
 
-    echo "-----> Installing"
-    make install | indent
-
-    cp -R $BUILD_DIR/src $CACHE_DIR/src
+    cp -R $BUILD_DIR/znc $CACHE_DIR/znc
     echo -n $VERSION > $CACHE_DIR/VERSION
 elif [ "$VERSION" = "$CACHED_VERSION" ]; then
     echo "-----> No change in znc version"
-    cp -R $CACHE_DIR/src $BUILD_DIR/src
+    cp -R $CACHE_DIR/znc/* $BUILD_DIR
 fi
 
 echo "-----> Setting up app"
