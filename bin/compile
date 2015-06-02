@@ -62,11 +62,11 @@ else
     echo "-----> Cleaning Up"
     rm -rf $CACHE_DIR/src $CACHE_DIR/VERSION
 
-
-    echo "-----> Moving artifacts to cache"
-    mv $BUILD_DIR/src $CACHE_DIR/
-    echo -n $VERSION > $CACHE_DIR/VERSION
 fi
+
+echo "-----> Moving artifacts to cache"
+mv $BUILD_DIR/src $CACHE_DIR/
+echo -n $VERSION > $CACHE_DIR/VERSION
 
 echo "-----> Setting up app"
 mkdir -vp $BUILD_DIR/.znc/{configs,modules,moddata,users}
