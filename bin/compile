@@ -35,7 +35,7 @@ if [ -f $CACHE_DIR/VERSION ]; then
     echo $CACHED_VERSION | indent
 fi
 
-if [ ! -d "$BUILD_DIR/src" ] || [ ! -d "$CACHE_DIR/src" ]; then
+if [ ! -d "$BUILD_DIR/src" ] && [ ! -d "$CACHE_DIR/src" ]; then
     cd $BUILD_DIR
 
     echo "-----> Downloading"
