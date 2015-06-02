@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+####
+#
+# Used to perform the transformation steps on the app
+#
+# Usage:
+#
+# ```shell
+# bin/compile BUILD_DIR CACHE_DIR ENV_DIR
+# ```
+set -e
+set -o pipefail
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+
+indent() {
+    sed -u 's/^/       /'
+}
+
+echo "-----> BUILD_DIR"
+echo "$BUILD_DIR" | indent
+echo "-----> CACHE_DIR"
+echo "$CACHE_DIR" | indent
+echo "-----> ENV_DIR"
+echo "$ENV_DIR" | indent
+
+
+cd $BUILD_DIR
+curl -s http://znc.in/releases/znc-latest.tar.gz > znc-latest.tar.gz
+tar -xzf znc-latest.tar.gz
+rm znc-latest.tar.gz
+
+echo "-----> Configuring"
+./configure --prefix=$BUILD_DIR 2>&1 1>/dev/null | indent
+
+echo "-----> Compiling"
+make 2>&1 1>/dev/null | indent
+
+echo "-----> Installing"
+make install 2>&1 1>/dev/null | indent

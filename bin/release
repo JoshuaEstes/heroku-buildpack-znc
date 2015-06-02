@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+####
+#
+# Provides metadata back to the runtime
+#
+# Usage:
+#
+# ```shell
+# bin/release BUILD_DIR
+# ```
+BUILD_DIR=$1
+
+cat << EOF
+---
+addons: []
+default_process_types:
+  znc: bin/znc -f
+EOF
