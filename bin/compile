@@ -115,7 +115,7 @@ fi
 debug "cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src"
 cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src
 
-section "Setting up app"
+section "Setting up app...."
 debug "mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin"
 mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin
 
@@ -123,9 +123,9 @@ if [ ! -f $BUILD_DIR/bin/znc ]; then
     ln -s $BUILD_DIR/znc-src/znc $BUILD_DIR/bin/znc
 fi
 
-for file in $BUILD_DIR/znc-src/modules; do
-    debug "mv $file $BUILD_DIR/.znc/modules/"
-    mv $file $BUILD_DIR/.znc/modules/
+for file in $BUILD_DIR/znc-src/modules/*; do
+    debug "cp $file $BUILD_DIR/.znc/modules/"
+    cp -R $file $BUILD_DIR/.znc/modules/
 done
 
 if [ -f $BUILD_DIR/znc.pem ]; then
@@ -134,7 +134,7 @@ if [ -f $BUILD_DIR/znc.pem ]; then
 fi
 
 if [ -d $BUILD_DIR/configs ]; then
-    for file in $BUILD_DIR/configs; do
+    for file in $BUILD_DIR/configs/*; do
         debug "mv $file $BUILD_DIR/.znc/configs/"
         mv $file $BUILD_DIR/.znc/configs/
     done
@@ -146,13 +146,13 @@ if [ -d $BUILD_DIR/modules ]; then
     done
 fi
 if [ -d $BUILD_DIR/moddata ]; then
-    for file in $BUILD_DIR/moddata; do
+    for file in $BUILD_DIR/moddata/*; do
         debug "mv $file $BUILD_DIR/.znc/moddata/"
         mv $file $BUILD_DIR/.znc/moddata/
     done
 fi
 if [ -d $BUILD_DIR/users ]; then
-    for file in $BUILD_DIR/users; do
+    for file in $BUILD_DIR/users/*; do
         debug "mv $file $BUILD_DIR/.znc/users/"
         mv $file $BUILD_DIR/.znc/users/
     done
