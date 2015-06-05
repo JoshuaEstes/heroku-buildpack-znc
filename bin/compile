@@ -134,10 +134,6 @@ section "Setting up app...."
 debug "mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin"
 mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin
 
-if [ ! -f $BUILD_DIR/bin/znc ]; then
-    ln -s ../zrc-src/znc $BUILD_DIR/bin/znc
-fi
-
 for file in $BUILD_DIR/znc-src/modules/*; do
     debug "cp $file $BUILD_DIR/.znc/modules/"
     cp -R $file $BUILD_DIR/.znc/modules/
