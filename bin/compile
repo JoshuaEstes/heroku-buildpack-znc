@@ -173,8 +173,8 @@ cat <<EOF >> $BUILD_DIR/bin/znc
 #!/usr/bin/env bash
 set -e
 
-for file in $HOME/.znc/configs/*; do
-    sed -i.bak "s/\$PORT/$PORT/g" $file
+for file in \$HOME/.znc/configs/*; do
+    sed -i.bak "s/\\\$PORT/\$PORT/g" \$file
 done
 
 exec znc-src/znc -f
