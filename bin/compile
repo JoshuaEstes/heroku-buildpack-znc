@@ -151,8 +151,8 @@ fi
 if [ -d $BUILD_DIR/configs ]; then
     for file in $BUILD_DIR/configs/*; do
         debug "mv $file $BUILD_DIR/.znc/configs/"
-        sed 's/\$PORT/$PORT/g' $file > $file.parsed
-        mv $file.parsed $BUILD_DIR/.znc/configs/
+        sed -i.bak "s/\$PORT/$PORT/g" $file
+        mv $file $BUILD_DIR/.znc/configs/
     done
 fi
 if [ -d $BUILD_DIR/modules ]; then
