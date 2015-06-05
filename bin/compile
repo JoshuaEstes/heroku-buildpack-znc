@@ -120,7 +120,7 @@ debug "mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin"
 mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin
 
 if [ ! -f $BUILD_DIR/bin/znc ]; then
-    ln -s $BUILD_DIR/znc-src/znc $BUILD_DIR/bin/znc
+    ln -s ../zrc-src/znc $BUILD_DIR/bin/znc
 fi
 
 for file in $BUILD_DIR/znc-src/modules/*; do
