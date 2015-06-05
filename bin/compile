@@ -53,6 +53,19 @@ error() {
 section() {
     echo "-----> $*"
 }
+
+export_env_dir() {
+    env_dir=$1
+    whitelist_regex=${2:-''}
+    blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH)$'}
+    if [ -d "$env_dir" ]; then
+        for e in $(ls $env_dir); do
+            echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+                export "$e=$(cat $env_dir/$e)"
+            :
+        done
+    fi
+}
 #### end helper functions ####
 
 _download_znc() {
@@ -89,6 +102,7 @@ _make_znc() {
 section "Compiling App...."
 debug "mkdir -p $CACHE_DIR"
 mkdir -p $CACHE_DIR
+export_env_dir $ENV_DIR
 
 if [ -f $CACHE_DIR/VERSION ]; then
     CACHED_VERSION="$(cat $CACHE_DIR/VERSION)"
@@ -113,7 +127,7 @@ elif [ "$VERSION" = "$CACHED_VERSION" ]; then
 fi
 
 debug "cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src"
-cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src
+cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src/
 
 section "Setting up app...."
 debug "mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin"
