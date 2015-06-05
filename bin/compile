@@ -149,13 +149,13 @@ if [ -f $BUILD_DIR/znc.pem ]; then
 fi
 
 if [ -d $BUILD_DIR/configs ]; then
-    for file in $BUILD_DIR/configs; do
+    for file in $BUILD_DIR/configs/*; do
         debug "mv $file $BUILD_DIR/.znc/configs/"
         mv $file $BUILD_DIR/.znc/configs/
     done
 fi
 if [ -d $BUILD_DIR/modules ]; then
-    for file in $BUILD_DIR/modules; do
+    for file in $BUILD_DIR/modules/*; do
         debug "mv $file $BUILD_DIR/.znc/modules/"
         mv $file $BUILD_DIR/.znc/modules/
     done
