@@ -168,3 +168,15 @@ if [ -d $BUILD_DIR/users ]; then
         mv $file $BUILD_DIR/.znc/users/
     done
 fi
+
+cat <<EOF >> $BUILD_DIR/bin/znc
+#!/usr/bin/env bash
+set -e
+
+for file in $HOME/.znc/configs/*; do
+    sed -i.bak "s/\$PORT/$PORT/g" $file
+done
+
+exec znc-src/znc -f
+EOF
+chmod +x $BUILD_DIR/bin/znc
