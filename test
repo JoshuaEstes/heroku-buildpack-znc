@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+####
+#
+# Test script to test repo
+#
+set -e
+set -o pipefail
+
+TEST_DIR="$(pwd)/test.d"
+BUILD_DIR="$TEST_DIR/build.d"
+CACHE_DIR="$TEST_DIR/cache.d"
+ENV_DIR="$TEST_DIR/env.d"
+
+if [ $CLEAN ]; then
+    rm -rf $BUILD_DIR $CACHE_DIR $ENV_DIR
+fi
+
+mkdir -vp $BUILD_DIR $ENV_DIR
+
+export DEBUG=1
+exec bin/compile $BUILD_DIR $CACHE_DIR $ENV_DIR
+
+# Check directories for files and see if this run correctly

@@ -23,51 +23,134 @@ ENV_DIR=$3
 VERSION=1.6.0
 RELEASE="znc-$VERSION"
 
+####
+#
+# Helper functions
+#
 indent() {
-    sed -u 's/^/       /'
+    c="${1:+"2,999"} s/^/       /"
+    case $(uname) in
+        Darwin) sed -l "$c";;
+        *)      sed -u "$c";;
+    esac
 }
 
-echo "-----> bin/compile"
+debug() {
+    if [ $DEBUG ]; then
+        echo "[DEBUG] $*" | indent
+    fi
+}
+
+warning() {
+    echo "[WARNING] $*" | indent
+}
+
+error() {
+    echo "[ERROR] $*" | indent
+    exit 1
+}
+
+section() {
+    echo "-----> $*"
+}
+#### end helper functions ####
+
+_download_znc() {
+    section "Downloading ZNC $VERSION...."
+    debug "curl -s http://znc.in/releases/$RELEASE.tar.gz > znc.tar.gz"
+    curl -s "http://znc.in/releases/$RELEASE.tar.gz" > znc.tar.gz
+    debug "tar -xzf znc.tar.gz"
+    tar -xzf znc.tar.gz
+    debug "mv $RELEASE znc-src"
+    mv $RELEASE znc-src
+    debug "rm znc.tar.gz"
+    rm znc.tar.gz
+    debug "Downloading ZNC Complete"
+}
+
+_configure_znc() {
+    section "Configuring ZNC...."
+    debug "cd $BUILD_DIR/znc-src"
+    cd $BUILD_DIR/znc-src
+    debug "./autogen.sh"
+    ./autogen.sh 2>&1 1>/dev/null | indent
+    debug "./configure --enable-run-from-source"
+    ./configure --enable-run-from-source 2>&1 1>/dev/null | indent
+    debug "Configuring ZNC Complete"
+}
+
+_make_znc() {
+    section "Compiling ZNC...."
+    debug "make"
+    make 2>&1 1>/dev/null | indent
+    debug "Compiling ZNC Complete"
+}
+
+section "Compiling App...."
+debug "mkdir -p $CACHE_DIR"
+mkdir -p $CACHE_DIR
 
 if [ -f $CACHE_DIR/VERSION ]; then
     CACHED_VERSION="$(cat $CACHE_DIR/VERSION)"
-    echo "-----> CACHED_VERSION"
-    echo $CACHED_VERSION | indent
 fi
 
-if [ ! -d "$BUILD_DIR/znc" ] && [ ! -d "$CACHE_DIR/znc" ]; then
+if [ ! -d "$BUILD_DIR/znc-src" ] && [ ! -d "$CACHE_DIR/znc-src" ]; then
+    debug "cd $BUILD_DIR"
     cd $BUILD_DIR
 
-    echo "-----> Downloading"
-    curl -s "http://znc.in/releases/$RELEASE.tar.gz" > znc.tar.gz
-    tar -xzf znc.tar.gz
-    mv $RELEASE znc
-    rm znc.tar.gz
+    _download_znc
+    _configure_znc
+    _make_znc
 
-    echo "-----> Configuring"
-    cd $BUILD_DIR/znc
-    ./autogen.sh | indent
-    ./configure --prefix=$BUILD_DIR --enable-run-from-source | indent
-
-    echo "-----> Compiling"
-    make | indent
-
-    rm -rf $CACHE_DIR/znc $CACHE_DIR/VERSION
-    cp -R $BUILD_DIR/znc $CACHE_DIR/znc
+    debug "rm -rf $CACHE_DIR/znc-src $CACHE_DIR/VERSION"
+    rm -rf $CACHE_DIR/znc-src $CACHE_DIR/VERSION
+    debug "cp -R $BUILD_DIR/znc-src $CACHE_DIR/znc-src"
+    cp -R $BUILD_DIR/znc-src $CACHE_DIR/znc-src
+    debug "echo -n $VERSION > $CACHE_DIR/VERSION"
     echo -n $VERSION > $CACHE_DIR/VERSION
 elif [ "$VERSION" = "$CACHED_VERSION" ]; then
-    echo "-----> No change in znc version"
+    debug "No change in znc version"
 fi
 
-cp -R $CACHE_DIR/znc/* $BUILD_DIR
+debug "cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src"
+cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src
 
-echo "-----> Setting up app"
-mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users}
+section "Setting up app"
+debug "mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin"
+mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin
+ln -s $BUILD_DIR/znc-src/znc $BUILD_DIR/bin/znc
 
-if [ -f $BUILD_DIR/znc.conf ]; then
-    mv -v $BUILD_DIR/znc.conf $BUILD_DIR/.znc/configs/znc.conf
-fi
+for file in $BUILD_DIR/zrc-src/modules; do
+    debug "mv $file $BUILD_DIR/.znc/modules/$file"
+    mv $file $BUILD_DIR/.znc/modules/$file
+done
 
 if [ -f $BUILD_DIR/znc.pem ]; then
-    mv -v $BUILD_DIR/znc.pem $BUILD_DIR/.znc/znc.pem
+    debug "mv $BUILD_DIR/znc.pem $BUILD_DIR/.znc/znc.pem"
+    mv $BUILD_DIR/znc.pem $BUILD_DIR/.znc/znc.pem
+fi
+
+if [ -d $BUILD_DIR/configs ]; then
+    for file in $BUILD_DIR/configs; do
+        debug "mv $file $BUILD_DIR/.znc/configs/$file"
+        mv $file $BUILD_DIR/.znc/configs/$file
+    done
+fi
+if [ -d $BUILD_DIR/modules ]; then
+    for file in $BUILD_DIR/modules; do
+        debug "mv $file $BUILD_DIR/.znc/modules/$file"
+        mv $file $BUILD_DIR/.znc/modules/$file
+    done
+fi
+if [ -d $BUILD_DIR/moddata ]; then
+    for file in $BUILD_DIR/moddata; do
+        debug "mv $file $BUILD_DIR/.znc/moddata/$file"
+        mv $file $BUILD_DIR/.znc/moddata/$file
+    done
+fi
+if [ -d $BUILD_DIR/users ]; then
+    for file in $BUILD_DIR/users; do
+        debug "mv $file $BUILD_DIR/.znc/users/$file"
+        mv $file $BUILD_DIR/.znc/users/$file
+    done
 fi
