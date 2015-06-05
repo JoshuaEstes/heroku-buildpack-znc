@@ -127,6 +127,7 @@ elif [ "$VERSION" = "$CACHED_VERSION" ]; then
 fi
 
 debug "cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src"
+mkdir -p $BUILD_DIR/znc-src
 cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src/
 
 section "Setting up app...."
