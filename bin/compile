@@ -106,6 +106,9 @@ _make_znc() {
     debug "make"
     make 2>&1 1>/dev/null | indent
     debug "Compiling ZNC Complete"
+    section "Installing ZNC..."
+    make install 2>&1 1>/dev/null | indent
+    debug "Installing ZNC Complete"
 }
 
 section "Compiling App...."
@@ -120,6 +123,8 @@ fi
 ####
 #
 # Check to see if ZNC needs to be compiled
+#
+# To force compile set env var COMPILE_ZNC to 1
 #
 if [ ! -d "$ZNC_BUILD_DIR" ] && [ ! -d "$ZNC_CACHE_DIR" ] || [ $COMPILE_ZNC ]; then
     _download_znc

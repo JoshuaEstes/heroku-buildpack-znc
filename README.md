@@ -32,9 +32,12 @@ See znc documentation on what goes in all those directories and files
 
 ## Change Log
 
+See [CHANGELOG.md]
+
 ## License
 
-MIT
-
+See [LICENSE]
 
 [znc]: http://znc.in
+[CHANGELOG.md]: https://github.com/JoshuaEstes/heroku-buildpack-znc/blob/master/CHANGELOG.md
+[LICENSE]: https://github.com/JoshuaEstes/heroku-buildpack-znc/blob/master/LICENSE
