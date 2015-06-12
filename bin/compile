@@ -20,7 +20,8 @@ BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
 ZNC_BUILD_DIR=$BUILD_DIR/znc-src
-ZNC_CACHE_DIR=$CACHE_DIR/znc-src
+ZNC_CACHE_DIR=$CACHE_DIR/znc
+ZNC_INSTALL_DIR=$BUILD_DIR/znc
 
 VERSION=1.6.0
 RELEASE="znc-$VERSION"
@@ -96,8 +97,8 @@ _configure_znc() {
     cd $ZNC_BUILD_DIR
     debug "./autogen.sh"
     ./autogen.sh 2>&1 1>/dev/null | indent
-    debug "./configure --enable-run-from-source"
-    ./configure --prefix=$ZNC_BUILD_DIR 2>&1 1>/dev/null | indent
+    debug "./configure --prefix=$ZNC_BUILD_DIR"
+    ./configure --prefix=$ZNC_INSTALL_DIR 2>&1 1>/dev/null | indent
     debug "Configuring ZNC Complete"
 }
 
@@ -107,6 +108,7 @@ _make_znc() {
     make 2>&1 1>/dev/null | indent
     debug "Compiling ZNC Complete"
     section "Installing ZNC..."
+    debug "make install"
     make install 2>&1 1>/dev/null | indent
     debug "Installing ZNC Complete"
 }
@@ -130,10 +132,11 @@ if [ ! -d "$ZNC_BUILD_DIR" ] && [ ! -d "$ZNC_CACHE_DIR" ] || [ $COMPILE_ZNC ]; t
     _download_znc
     _configure_znc
     _make_znc
+
     debug "rm -rf $ZNC_CACHE_DIR $ZNC_CACHE_DIR/VERSION"
     rm -rf $ZNC_CACHE_DIR $ZNC_CACHE_DIR/VERSION
-    debug "cp -R $ZNC_BUILD_DIR $ZNC_CACHE_DIR"
-    cp -R $ZNC_BUILD_DIR $ZNC_CACHE_DIR
+    debug "cp -R $ZNC_INSTALL_DIR $ZNC_CACHE_DIR"
+    cp -R $ZNC_INSTALL_DIR $ZNC_CACHE_DIR
     debug "echo -n $VERSION > $ZNC_CACHE_DIR/VERSION"
     echo -n $VERSION > $ZNC_CACHE_DIR/VERSION
 elif [ "$VERSION" = "$CACHED_VERSION" ]; then
@@ -144,9 +147,9 @@ fi
 #
 # Copy the cached ZNC source to the build directory
 #
-debug "cp -R $ZNC_CACHE_DIR/* $ZNC_BUILD_DIR"
-mkdir -p $ZNC_BUILD_DIR
-cp -R $ZNC_CACHE_DIR/* $ZNC_BUILD_DIR
+debug "cp -R $ZNC_CACHE_DIR/* $ZNC_INSTALL_DIR"
+mkdir -p $ZNC_INSTALL_DIR
+cp -R $ZNC_CACHE_DIR/* $ZNC_INSTALL_DIR
 
 ####
 #
@@ -175,24 +178,28 @@ if [ -d $BUILD_DIR/configs ]; then
         debug "mv $file $BUILD_DIR/.znc/configs/"
         mv $file $BUILD_DIR/.znc/configs/
     done
+    rm -rf $BUILD_DIR/configs # should be empty
 fi
 if [ -d $BUILD_DIR/modules ]; then
     for file in $BUILD_DIR/modules/*; do
         debug "mv $file $BUILD_DIR/.znc/modules/"
         mv $file $BUILD_DIR/.znc/modules/
     done
+    rm -rf $BUILD_DIR/modules # should be empty
 fi
 if [ -d $BUILD_DIR/moddata ]; then
     for file in $BUILD_DIR/moddata/*; do
         debug "mv $file $BUILD_DIR/.znc/moddata/"
         mv $file $BUILD_DIR/.znc/moddata/
     done
+    rm -rf $BUILD_DIR/moddata # should be empty
 fi
 if [ -d $BUILD_DIR/users ]; then
     for file in $BUILD_DIR/users/*; do
         debug "mv $file $BUILD_DIR/.znc/users/"
         mv $file $BUILD_DIR/.znc/users/
     done
+    rm -rf $BUILD_DIR/users # should be empty
 fi
 
 ####
