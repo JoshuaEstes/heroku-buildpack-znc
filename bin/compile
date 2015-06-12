@@ -121,7 +121,7 @@ fi
 #
 # Check to see if ZNC needs to be compiled
 #
-if [ ! -d "$ZNC_BUILD_DIR" ] && [ ! -d "$ZNC_CACHE_DIR" ]; then
+if [ ! -d "$ZNC_BUILD_DIR" ] && [ ! -d "$ZNC_CACHE_DIR" ] || [ $COMPILE_ZNC ]; then
     _download_znc
     _configure_znc
     _make_znc
