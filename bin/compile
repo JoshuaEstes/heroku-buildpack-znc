@@ -21,7 +21,7 @@ CACHE_DIR=$2
 ENV_DIR=$3
 ZNC_BUILD_DIR=$BUILD_DIR/znc-src
 ZNC_CACHE_DIR=$CACHE_DIR/znc
-ZNC_INSTALL_DIR=/app/znc
+ZNC_INSTALL_DIR=$BUILD_DIR/znc
 
 VERSION=1.6.0
 RELEASE="znc-$VERSION"
@@ -163,11 +163,16 @@ mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin
 #
 # Copy everything into znc home
 #
+for file in $ZNC_INSTALL_DIR/lib/znc/*; do
+    debug "cp $file $BUILD_DIR/.znc/modules/"
+    cp -R $file $BUILD_DIR/.znc/modules/
+done
 if [ -d $BUILD_DIR/modules ]; then
     for file in $BUILD_DIR/modules/*; do
         debug "cp $file $BUILD_DIR/.znc/modules/"
         cp -R $file $BUILD_DIR/.znc/modules/
     done
+    rm -rf $BUILD_DIR/modules # should be empty
 fi
 
 if [ -f $BUILD_DIR/znc.pem ]; then
