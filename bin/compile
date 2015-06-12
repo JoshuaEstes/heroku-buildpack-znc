@@ -163,11 +163,13 @@ mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin
 #
 # Copy everything into znc home
 #
+section "moving modules"
 for file in $ZNC_INSTALL_DIR/lib/znc/*; do
     debug "cp $file $BUILD_DIR/.znc/modules/"
     cp -R $file $BUILD_DIR/.znc/modules/
 done
 if [ -d $BUILD_DIR/modules ]; then
+    section "moving custom modules"
     for file in $BUILD_DIR/modules/*; do
         debug "cp $file $BUILD_DIR/.znc/modules/"
         cp -R $file $BUILD_DIR/.znc/modules/
@@ -221,6 +223,6 @@ for file in \$HOME/.znc/configs/*; do
     sed -i.bak "s/\\\$PORT/\$PORT/g" \$file
 done
 
-exec znc/bin/znc -f
+exec znc/bin/znc -fD
 EOF
 chmod +x $BUILD_DIR/bin/znc
