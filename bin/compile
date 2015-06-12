@@ -9,7 +9,7 @@
 # bin/compile BUILD_DIR CACHE_DIR ENV_DIR
 # ```
 #
-# ToDo:
+# Todo:
 #   - enable python support for addons
 #   - possible to configure if no znc.conf found?
 #
@@ -19,6 +19,8 @@ set -o pipefail
 BUILD_DIR=$1
 CACHE_DIR=$2
 ENV_DIR=$3
+ZNC_BUILD_DIR=$BUILD_DIR/znc-src
+ZNC_CACHE_DIR=$CACHE_DIR/znc-src
 
 VERSION=1.6.0
 RELEASE="znc-$VERSION"
@@ -36,6 +38,7 @@ indent() {
 }
 
 debug() {
+    # To enable debug, set env var in heroku to 1
     if [ $DEBUG ]; then
         echo "[DEBUG] $*" | indent
     fi
@@ -68,14 +71,20 @@ export_env_dir() {
 }
 #### end helper functions ####
 
+####
+#
+# Download, untar ZNC
+#
 _download_znc() {
+    debug "cd $BUILD_DIR"
+    cd $BUILD_DIR
     section "Downloading ZNC $VERSION...."
     debug "curl -s http://znc.in/releases/$RELEASE.tar.gz > znc.tar.gz"
     curl -s "http://znc.in/releases/$RELEASE.tar.gz" > znc.tar.gz
     debug "tar -xzf znc.tar.gz"
     tar -xzf znc.tar.gz
-    debug "mv $RELEASE znc-src"
-    mv $RELEASE znc-src
+    debug "mv $RELEASE $ZNC_BUILD_DIR"
+    mv $RELEASE $ZNC_BUILD_DIR
     debug "rm znc.tar.gz"
     rm znc.tar.gz
     debug "Downloading ZNC Complete"
@@ -83,12 +92,12 @@ _download_znc() {
 
 _configure_znc() {
     section "Configuring ZNC...."
-    debug "cd $BUILD_DIR/znc-src"
-    cd $BUILD_DIR/znc-src
+    debug "cd $ZNC_BUILD_DIR"
+    cd $ZNC_BUILD_DIR
     debug "./autogen.sh"
     ./autogen.sh 2>&1 1>/dev/null | indent
     debug "./configure --enable-run-from-source"
-    ./configure --enable-run-from-source 2>&1 1>/dev/null | indent
+    ./configure --prefix=$ZNC_BUILD_DIR 2>&1 1>/dev/null | indent
     debug "Configuring ZNC Complete"
 }
 
@@ -104,37 +113,49 @@ debug "mkdir -p $CACHE_DIR"
 mkdir -p $CACHE_DIR
 export_env_dir $ENV_DIR
 
-if [ -f $CACHE_DIR/VERSION ]; then
-    CACHED_VERSION="$(cat $CACHE_DIR/VERSION)"
+if [ -f $ZNC_CACHE_DIR/VERSION ]; then
+    CACHED_VERSION="$(cat $ZNC_CACHE_DIR/VERSION)"
 fi
 
-if [ ! -d "$BUILD_DIR/znc-src" ] && [ ! -d "$CACHE_DIR/znc-src" ]; then
-    debug "cd $BUILD_DIR"
-    cd $BUILD_DIR
-
+####
+#
+# Check to see if ZNC needs to be compiled
+#
+if [ ! -d "$ZNC_BUILD_DIR" ] && [ ! -d "$ZNC_CACHE_DIR" ]; then
     _download_znc
     _configure_znc
     _make_znc
-
-    debug "rm -rf $CACHE_DIR/znc-src $CACHE_DIR/VERSION"
-    rm -rf $CACHE_DIR/znc-src $CACHE_DIR/VERSION
-    debug "cp -R $BUILD_DIR/znc-src $CACHE_DIR/znc-src"
-    cp -R $BUILD_DIR/znc-src $CACHE_DIR/znc-src
-    debug "echo -n $VERSION > $CACHE_DIR/VERSION"
-    echo -n $VERSION > $CACHE_DIR/VERSION
+    debug "rm -rf $ZNC_CACHE_DIR $ZNC_CACHE_DIR/VERSION"
+    rm -rf $ZNC_CACHE_DIR $ZNC_CACHE_DIR/VERSION
+    debug "cp -R $ZNC_BUILD_DIR $ZNC_CACHE_DIR"
+    cp -R $ZNC_BUILD_DIR $ZNC_CACHE_DIR
+    debug "echo -n $VERSION > $ZNC_CACHE_DIR/VERSION"
+    echo -n $VERSION > $ZNC_CACHE_DIR/VERSION
 elif [ "$VERSION" = "$CACHED_VERSION" ]; then
     debug "No change in znc version"
 fi
 
-debug "cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src"
-mkdir -p $BUILD_DIR/znc-src
-cp -R $CACHE_DIR/znc-src/* $BUILD_DIR/znc-src/
+####
+#
+# Copy the cached ZNC source to the build directory
+#
+debug "cp -R $ZNC_CACHE_DIR/* $ZNC_BUILD_DIR"
+mkdir -p $ZNC_BUILD_DIR
+cp -R $ZNC_CACHE_DIR/* $ZNC_BUILD_DIR
 
+####
+#
+# Make sure all the directories we require are created
+#
 section "Setting up app...."
 debug "mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin"
 mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin
 
-for file in $BUILD_DIR/znc-src/modules/*; do
+####
+#
+# Copy everything into znc home
+#
+for file in $ZNC_BUILD_DIR/modules/*; do
     debug "cp $file $BUILD_DIR/.znc/modules/"
     cp -R $file $BUILD_DIR/.znc/modules/
 done
@@ -169,6 +190,10 @@ if [ -d $BUILD_DIR/users ]; then
     done
 fi
 
+####
+#
+# Create the run script
+#
 cat <<EOF >> $BUILD_DIR/bin/znc
 #!/usr/bin/env bash
 set -e
@@ -177,6 +202,6 @@ for file in \$HOME/.znc/configs/*; do
     sed -i.bak "s/\\\$PORT/\$PORT/g" \$file
 done
 
-exec znc-src/znc -f
+exec znc-src/bin/znc -f
 EOF
 chmod +x $BUILD_DIR/bin/znc
