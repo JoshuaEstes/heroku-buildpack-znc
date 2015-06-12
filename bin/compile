@@ -163,10 +163,12 @@ mkdir -p $BUILD_DIR/.znc/{configs,modules,moddata,users} $BUILD_DIR/bin
 #
 # Copy everything into znc home
 #
-for file in $ZNC_BUILD_DIR/modules/*; do
-    debug "cp $file $BUILD_DIR/.znc/modules/"
-    cp -R $file $BUILD_DIR/.znc/modules/
-done
+if [ -d $BUILD_DIR/modules ]; then
+    for file in $BUILD_DIR/modules/*; do
+        debug "cp $file $BUILD_DIR/.znc/modules/"
+        cp -R $file $BUILD_DIR/.znc/modules/
+    done
+fi
 
 if [ -f $BUILD_DIR/znc.pem ]; then
     debug "mv $BUILD_DIR/znc.pem $BUILD_DIR/.znc/znc.pem"
