@@ -12,6 +12,6 @@ BUILD_DIR=$1
 if [ -f $BUILD_DIR/configs/znc.conf ]; then
     echo "ZNC"
     exit 0
-else
-    exit 1
 fi
+
+exit 1
